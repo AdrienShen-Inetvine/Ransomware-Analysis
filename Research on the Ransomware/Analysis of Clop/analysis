@@ -1,0 +1,23 @@
+The main entry function is quite simple: it primarily generates a key, forks to retain the child process, and exits the parent process (considering compatibility with sandboxes in this situation). It then sets the file creation permission mask for the process and attempts to open and write to the system log. After that, it uses the `setsid` function to create a daemon process, allowing the process to detach from the terminal control. Next, it closes standard input and output, after which Clop repeatedly runs the `do_heartbeat()` function to perform file infections, as follows:
+
+It is worth noting that after the infection is complete, the program does not exit but instead executes the `sleep(-1)` function to enter an infinite sleep state.
+
+The `find` function code is as follows:
+
+This piece of code implements the functionality to search for files in a specified directory and process the found files. Specifically, this function accepts two parameters: one is the specified directory name (given as a string), and the other is the file name to be searched for (also given as a string). The function first attempts to open the specified directory; if successful, it loops through all files in the directory. For each file, it checks whether its name is "." or "..". If not, it combines the directory name and file name to form a complete file path, then calls the `EncrFile` function to encrypt it.
+
+In the specific implementation, it first calls the `CreateRadMe` function to create a README file containing ransom information, then combines the directory name and file name to form a complete file path, passing the path to the `EncrFile` function for processing. During the processing, if the file name does not contain the string "C_I_0P", it calls the `EncrFile` function to encrypt it. Finally, it uses the `stat64` function to obtain information about the file; if the file is a directory, it recursively calls the `find` function to process it. If opening the directory fails, it outputs an error message and returns 1 to indicate the search failed. Otherwise, the function returns 0 to indicate the search succeeded.
+
+The `EncrFile` function code is as follows:
+
+This piece of code defines a function named `EncrFile`, which takes a string type parameter `pathname`. The main purpose of this function is to encrypt files.
+
+Inside the function, it first constructs a new path named `.v5` and checks whether the file corresponding to this path exists. If the file does not exist, the function will perform encryption on the original file. The encryption process is relatively complex. First, the function opens the original file, obtains the file size and block size using `fstat64`, and then maps the file into the process's address space using `mmap64`.
+
+Next, the function selects a set of pseudorandom numbers from a global array named `pocT` and uses these pseudorandom numbers to generate a key via the RC4 algorithm, then encrypts the key with the RC4 algorithm and writes it to the file. Finally, the function calls `munmap` to unmap the file, completing the encryption operation.
+
+(This piece of code is quite enlightening; in fact, viruses do not necessarily have to use `read` and `write` functions. This example demonstrates that some viruses may even adopt methods to read the entire file into memory, delete the file, and rewrite a new file to evade conventional APIs.)
+
+Thus, the analysis of the Linux Clop ransomware concludes.
+
+It is worth noting that the Windows version of Clop also performs the following operations: Later, the thread uses handle 0 to virtually call the function "EraseTape," which may be intended to interfere with emulators, as the handle is set to 0 in the hard-coded operation codes. Subsequently, it makes an invalid name call to the "DefineDosDeviceA" function, which returns another error. These operations will loop 666,000 times. In practice, sandboxes also need to consider these anti-sandbox situations.
