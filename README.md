@@ -18,7 +18,7 @@ Ransomware is a type of malicious software that encrypts files on a victim’s s
 ## Company Information
 
 This analysis has been conducted by 
-**Beijing Inetvine Technology Corporation**（北京网藤科技有限公司 https://www.inetvine.com/ ）.
+**Beijing Inetvine Technology Corporation** .</br>（北京网藤科技有限公司 https://www.inetvine.com/ ）
 
 **Beijing Inetvine Technology Corporation**
  </br>![images](Resource/inetvine.png) </br>

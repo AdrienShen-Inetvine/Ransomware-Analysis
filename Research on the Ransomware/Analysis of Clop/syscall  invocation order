@@ -1,0 +1,47 @@
+openat(AT_FDCWD, "file.enc", O_RDWR)    = 3
+fstat(3, {st_mode=S_IFREG|0664, st_size=19824, ...}) = 0
+mmap(NULL, 19824, PROT_READ|PROT_WRITE, MAP_SHARED, 3, 0) = 0x7f0eee270000
+munmap(0x7f0eee270000, 19824)           = 0
+close(3)                                = 0
+
+
+
+About Sleep
+
+sleep(1);
+
+usleep(1);
+
+timespec sleepTime;
+sleepTime.tv_sec = 0;
+sleepTime.tv_nsec = 1;
+nanosleep(&sleepTime, NULL);
+
+clock_nanosleep(CLOCK_REALTIME, 0, {tv_sec=1, tv_nsec=0}, 0x7fff28771cf0) = 0
+
+clock_nanosleep(CLOCK_REALTIME, 0, {tv_sec=0, tv_nsec=1000}, NULL) = 0
+
+clock_nanosleep(CLOCK_REALTIME, 0, {tv_sec=0, tv_nsec=1}, NULL) = 0
+
+
+
+Extension Name：*.*
+
+
+
+Additional ransomware features：
+
+waitpid(child_pid, &status, 0);
+ptrace(PTRACE_ATTACH, child_pid, NULL, NULL);
+ptrace(PTRACE_SYSCALL, child_pid, NULL, NULL);
+
+wait4(32776, a.out  test.cpp)
+ptrace(PTRACE_ATTACH, 32776)            = -1 ESRCH (No such process)
+write(1, "Attached to child process.\n", 27Attached to child process.) = 27
+ptrace(PTRACE_SYSCALL, 32776, NULL, 0)  = -1 ESRCH (No such process)
+
+
+
+pid_t pid = fork();
+
+clone(child_stack=NULL, flags=CLONE_CHILD_CLEARTID|CLONE_CHILD_SETTID|SIGCHLD, child_tidptr=0x7fb911142810) = 2629
