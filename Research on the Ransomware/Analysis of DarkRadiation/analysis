@@ -1,0 +1,31 @@
+### SSH Worm Virus
+
+**downloader.sh** is an SSH worm that accepts base64-encoded configuration credentials as parameters. These credentials are either discarded by the attacker after initially being used on the victim's system or used as part of a brute force list targeting systems with weak password protection. Essentially, this malware checks whether the given configuration is set up to use SSH password attacks or SSH key-based attacks. It can also test SSH passwords or SSH keys against target IP addresses. Upon a successful connection, the malware downloads and executes ransomware on the remote system.
+
+The following is the decoded format of the credentials input into the script:
+
+The code snippet below demonstrates this behavior of the malware:
+
+The `check_ssh_connection` function returns the code: 0 indicates a successful connection, code: 254 indicates a ping error, and code: 255 indicates an SSH connection error, including password and key errors. The malware uses the `sshpass` tool for non-interactive SSH password authentication. In the case of inline SSH passwords, the malware sets the `sshpass` parameter to "passwordauthentication=yes." It stores the ransom script in the "/usr/share/man/man8/" directory and executes it.
+
+To keep the process running in case the SSH session is terminated, the malware uses a screen session and the `nohup` command. The malware obtains the encrypted password (`$crypt_pass`) through API calls to its C&C server and passes it to the `supermicro_cr.gz` script.
+
+The malware has an `install_tools` function to download and install necessary utilities on the infected system, if they are not already installed. According to this function, we can see that the worm only downloads and installs prerequisite packages for CentOS or RHEL-based Linux distributions, as it only uses the Yellowdog Updater, Modified (YUM) package manager. Other hacker tools and variants of DarkRadiation ransomware also use YUM to download and install prerequisite packages.
+
+Finally, the malware reports the scanning/spreading results to the attacker via Telegram's API.
+
+### DarkRadiation Ransomware
+
+In the previous section, we talked about the SSH worm script that received credential configurations as base64 parameters and used them to download and execute ransomware on target systems. In this section, we examine various iterations of the ransomware, specifically investigating a script named `supermicro_cr_third`, which appears to be the latest version. This ransomware is written in bash and targets Red Hat/CentOS-like Linux distributions. The malware uses OpenSSL's AES algorithm in CBC mode to encrypt files in various directories. It also uses Telegram's API to send infection status to the threat actor.
+
+We observed that this script is in a serious development phase, with various versions of the ransomware being quite similar, showing only minor changes. Some functions are commented out by the malware author, while others are not utilized in certain cases (dead code). In this section, we will discuss the working details of this ransomware.
+
+The script is obfuscated using an open-source tool called **node-bash-obfuscate**, which is a Node.js CLI tool and library for obfuscating bash scripts. This tool splits the bash script into several blocks and assigns a variable name to each block, replacing the original script with variable references, essentially scrambling the original script.
+
+The following code snippet demonstrates the use of this script to obfuscate a bash script:
+
+Upon execution, the malware checks if it is being run as root; if not, it displays the message "Please run as root," deletes itself, and exits. Then it checks if `curl` and `OpenSSL` are installed; if not, the malware downloads and installs them.
+
+The `bot_who` function is a bash script that uses the `who` command to take a snapshot of users currently logged into the Unix computer system. It stores the result in a hidden file called `/tmp/.ccw`. After that, every five seconds, it executes the `who` command again and checks the output against the `.ccw` file. If they are not equal (indicating a new user has logged in), the malware sends a message to the attacker via Telegram's API.
+
+Before the encryption process, the ransomware queries the `/etc/shadow` file to retrieve a list of all available users on the infected system. It overwrites all existing user passwords with "megapassword" and deletes all existing users except for "ferrum." After that, the malware creates a new user with the username "ferrum" and the password "MegPw0rD3". It executes the `usermod --shell /bin/nologin` command to disable all existing shell users on the infected system.

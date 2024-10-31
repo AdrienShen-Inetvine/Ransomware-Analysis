@@ -1,0 +1,42 @@
+### Main Function
+
+The main function outputs the message "Iniciando cifrado - CONTI POC" and moves to a new line. It calls the `InitializeEncryptor` function to initialize the encryptor. If the return value is zero, it indicates that initialization failed, and it outputs the error message "Something went wrong!" (line 8). It calls the `find_files_recursive` function to recursively scan the target folder and encrypt files that meet the criteria. For specific details, refer to the implementation process of the `find_files_recursive` function (line 10). The function outputs file encryption statistics: number of encrypted files, number of unencrypted files, number of skipped files, and total number of files (line 14-17).
+
+### Initialize Encryption Function
+
+This function's purpose is to initialize the encryptor and read the RSA public key. The specific steps are as follows:
+- Define a character array `s` and assign the RSA public key string to it (line 6-20).
+- Get the length of the string `s` and dynamically allocate memory for it.
+- Write the string `s` into a memory buffer (using `BIO_new_mem_buf`).
+- Read the RSA public key from the memory buffer (using `PEM_read_bio_RSAPublicKey`).
+- Finally, check whether the RSA public key was successfully read. If successful, return true to indicate successful initialization; otherwise, return false to indicate initialization failure.
+
+Note that a global variable `g_publickey` is also defined in this function to store the read public key.
+
+### Find Function
+
+The parameter `a1` is the target folder. First, it concatenates the folder path with `/CONTI_README.txt` and writes ransom organization information into `CONTI_README.txt`. Then, it traverses the files in the target folder. Using the `readdir` function, it can read the files and folders in the target directory one by one. If the directory is not `.` or `..`, it performs different operations based on the file type:
+- If the current folder is a directory, it constructs the absolute path of the subdirectory and recursively calls the current function.
+- If it is a file, it checks whether it is a specific type of file (e.g., `.log`, `.vmdk`, `.vmem`, `.vswp`, `.vmsn`, etc.). If it is, it first increments the file count, then constructs the absolute path of the file and allocates space to store the path. Finally, it calls the `encrypt_file` function to perform encryption on the file.
+
+### Encrypt File Function
+
+This function primarily determines whether the file needs to be encrypted and modifies the type of the encrypted file.
+- First, it obtains the file size and determines whether encryption is needed (line 16).
+- If encryption is needed, it first calls the `WriteEncryptInfo` function to generate the encryption key and append it to the file (line 19).
+- Then it calls the `EncryptFull` function to fully encrypt the file (line 21).
+- If encryption is successful, it renames the original file to the conti format (line 30).
+
+### Write Encrypt Info Function
+
+The `WriteEncryptInfo` function's main purpose is to use the RSA public key to encrypt some encryption information and write the encrypted data to a file. This function does not directly encrypt the file.
+- It calls the `GenKey()` function to generate a key pair and saves the result in the `key_info` variable. The `GenKey` function's main purpose is to generate an encryption key. Specifically, this function uses OpenSSL's `RAND_bytes` function to generate a random byte sequence (line 10).
+- It moves the pointer to the end of the file to ensure that writing is in append mode (line 21).
+- It uses the RSA public key to encrypt the encryption information and saves the result in the `v8` variable (line 29).
+- It writes the encrypted data to the file (line 36).
+
+### Encrypt Full Function
+
+The `EncryptFull` function's main purpose is to encrypt the file. Specifically, this function reads the file contents into the `buf` buffer, then uses the ECRYPT algorithm to encrypt the data in the buffer and writes the encrypted results back to the original file.
+- It reads the file into the buffer (line 9).
+- It calls the encryption algorithm to encrypt, where `a1 + 16` contains the data structure related to encryption, which includes various parameters and keys needed for encryption. `buf` represents the data buffer to be encrypted, and `v3` is the length of the data to be encrypted. This function uses the keys and initialization vector generated in the `GenKey`

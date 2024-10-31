@@ -1,0 +1,17 @@
+### Killing All Processes Except the Current One
+
+This part of the code is responsible for terminating all processes except for the current process.
+
+### Encryption Part
+
+The program recursively traverses all files and subdirectories in a specified directory. If it encounters a directory, it recurses into it; if it finds a file, it executes a function named `crypt_file` to perform encryption. However, it does not encrypt the `.` and `..` directories, nor does it encrypt specific folders such as `grub` or files named `loader` and `loader.rc`. It continues to pass the remaining file paths to the `crypt_file` function for further processing. Additionally, it uses a variable called `depth` to record the recursion depth. If the depth reaches 17, the function returns `0xFFFFFFFF` directly.
+
+### Deleting Files
+
+This code block reads the contents of the directory `/etc/grub.d/` and deletes all files except for `40_custom`. First, it uses the `readdir` function to read the contents of the directory `/etc/grub.d/`, ignoring the current directory `.` and the parent directory `..`. For the other files, it uses `strcpy` and `strcat` to construct a complete file path by concatenating the directory path and the file name. If the file name does not contain `40_custom`, the code calls `remove` to delete the file.
+
+Deleting GRUB2 boot menu script files in the `/etc/grub.d/` directory may prevent the system from booting into certain operating systems or kernels, as these files contain configuration information for the boot menu and boot options for operating systems/kernels. If important script files are deleted, the system may fail to boot properly, leading to an inability to start the operating system or kernel. Therefore, before deleting any GRUB2 boot menu script files, it is essential to ensure that it does not affect the normal boot process of the system.
+
+### Ransom Note
+
+(The section entitled "Ransom Note" likely follows this context, but the content regarding the ransom note itself was not provided. If you have specific details or text for the ransom note, feel free to share, and I can assist with that as well.)
